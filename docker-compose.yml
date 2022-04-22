@@ -1,0 +1,29 @@
+version: '3.0'
+services:
+  messenger-api:
+    container_name: messenger-api
+    build: messenger
+    image: messenger-api:latest
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    # mounting the current dir as volume, it is faster to change local files
+    # and see the change reflects without building image, useful for local dev
+    # Tip: on MAC if you get error: Error response from daemon: Mounts denied: approving
+    # make sure the current directory is not stored in MAC protected paths like Documents
+    volumes:
+      - ./messenger:/home/ubuntu/messenger
+
+  emqx:
+    container_name: emqx
+    build: emqx
+    image: emqx:latest
+    ports:
+      - 18083:18083
+      - 1883:1883
+      - 8083:8083
+    volumes:
+      - ./emqx:/home/ubuntu/emqx
+    links:
+      - messenger-api
